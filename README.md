@@ -17,8 +17,8 @@ This repository implements a complete Machine Learning / Deep Learning pipeline 
 - **Source File**: `credit_card_default.csv`
 - **Total Records**: 30,000 clients
 - **Target Variable**: `default_payment_next_month`
-  - `0`: Non-Default (77.88%)
-  - `1`: Default (22.12%)
+  - `0`: Non-Default (23,364 clients / 77.88%)
+  - `1`: Default (6,636 clients / 22.12%)
 
 ### Key Features:
 - **Demographics**: `LIMIT_BAL`, `sex`, `education`, `marriage`, `age`
@@ -52,18 +52,11 @@ This repository implements a complete Machine Learning / Deep Learning pipeline 
 Input (32) ──> Dense(64, ReLU) ──> Dense(32, ReLU) ──> Dense(16, ReLU) ──> Dense(1, Sigmoid)
 ```
 
-### 3. Optimization & Training
-- **Optimizer**: Adam
-- **Loss Function**: Binary Crossentropy
-- **Callbacks**: Early Stopping (`monitor='val_loss'`, `patience=5`)
-- **Batch Size**: 32
-- **Epochs**: Up to 50
-
 ---
 
-## 🏆 Model Performance & Results
+## 🏆 Model Performance & Evaluation Metrics
 
-### Final Test Set Metrics (at Decision Threshold = 0.60):
+### Final Test Set Results (Decision Threshold = 0.60):
 
 | Metric | Score |
 | :--- | :--- |
@@ -76,23 +69,165 @@ Input (32) ──> Dense(64, ReLU) ──> Dense(32, ReLU) ──> Dense(16, ReL
 
 ### Confusion Matrix:
 
-```
-                  Predicted Non-Default (0)    Predicted Default (1)
-Actual Non-Default (0)       3988 (TN)                    685 (FP)
-Actual Default (1)            605 (FN)                    722 (TP)
-```
+| | Predicted Non-Default (0) | Predicted Default (1) |
+|---|---|---|
+| **Actual Non-Default (0)** | **3,988** (TN) | **685** (FP) |
+| **Actual Default (1)** | **605** (FN) | **722** (TP) |
 
 ---
 
-## 📈 Visualizations
+## 📈 Visualizations & Graphs
 
-The pipeline generates training and evaluation plots saved as PNG images:
+### 1. Training vs Validation Loss
+Tracks loss reduction over training epochs with Early Stopping.
 
-1. **Training vs. Validation Loss (`loss_curve.png`)**
-2. **Training vs. Validation Accuracy (`accuracy_curve.png`)**
-3. **Confusion Matrix Heatmap (`confusion_matrix.png`)**
-4. **ROC Curve (`roc_curve.png`)**
-5. **Precision-Recall Curve (`precision_recall_curve.png`)**
+![Training vs Validation Loss](loss_curve.png)
+
+---
+
+### 2. Training vs Validation Accuracy
+Monitors classification accuracy progression across training and validation sets.
+
+![Training vs Validation Accuracy](accuracy_curve.png)
+
+---
+
+### 3. Confusion Matrix Heatmap
+Visualizes True Positives, True Negatives, False Positives, and False Negatives on test data.
+
+![Confusion Matrix Heatmap](confusion_matrix.png)
+
+---
+
+### 4. Receiver Operating Characteristic (ROC) Curve
+Displays True Positive Rate vs False Positive Rate (AUC = `0.758`).
+
+![ROC Curve](roc_curve.png)
+
+---
+
+### 5. Precision-Recall Curve
+Plots Precision vs Recall performance across decision thresholds (Average Precision = `0.526`).
+
+![Precision-Recall Curve](precision_recall_curve.png)
+
+---
+
+## 🖥️ Console Execution Output
+
+```text
+=================================================================
+CREDIT CARD DEFAULT PREDICTION - ANN
+=================================================================
+
+Dataset Shape : (30000, 25)
+
+Missing Values Before Preprocessing: 600
+Duplicate Rows: 0
+
+Target Distribution:
+0    23364
+1     6636
+
+Target Percentage:
+0    77.88%
+1    22.12%
+
+-----------------------------------------------------------------
+AFTER PREPROCESSING
+-----------------------------------------------------------------
+Missing Values : 0
+Dataset Shape  : (30000, 33)
+
+Features (X)   : (30000, 32)
+Target (y)     : (30000,)
+
+=================================================================
+DATA SPLIT
+=================================================================
+Training   : (21600, 32)
+Validation : (2400, 32)
+Testing    : (6000, 32)
+
+Class Distribution:
+Training   -> 0: 16822 | 1: 4778
+Validation -> 0: 1869  | 1: 531
+Testing    -> 0: 4673  | 1: 1327
+
+Class Weights:
+Class 0: 0.6420
+Class 1: 2.2604
+
+=================================================================
+ANN MODEL
+=================================================================
+ Total params: 4,737 (18.50 KB)
+ Trainable params: 4,737 (18.50 KB)
+
+=================================================================
+VALIDATION THRESHOLD ANALYSIS
+=================================================================
+Threshold   Precision   Recall      F1 Score    
+------------------------------------------------
+0.10        0.232       0.985       0.376       
+0.15        0.242       0.957       0.386       
+0.20        0.258       0.932       0.404       
+0.25        0.273       0.896       0.419       
+0.30        0.295       0.866       0.441       
+0.35        0.321       0.798       0.458       
+0.40        0.352       0.733       0.476       
+0.45        0.393       0.663       0.493       
+0.50        0.427       0.599       0.498       
+0.55        0.467       0.574       0.515       
+0.60        0.509       0.531       0.520  <-- BEST F1
+0.65        0.537       0.480       0.507       
+0.70        0.570       0.446       0.501       
+0.75        0.618       0.399       0.485       
+0.80        0.657       0.350       0.457       
+0.85        0.695       0.266       0.384       
+0.90        0.690       0.130       0.219       
+
+BEST THRESHOLD = 0.60
+Validation Precision = 0.509
+Validation Recall    = 0.531
+Validation F1 Score  = 0.520
+
+=================================================================
+FINAL TEST RESULTS
+=================================================================
+Decision Threshold   : 0.60
+Accuracy             : 0.7850
+Precision            : 0.5131
+Recall               : 0.5441
+F1 Score             : 0.5282
+ROC-AUC              : 0.7576
+Average Precision    : 0.5263
+
+-----------------------------------------------------------------
+CONFUSION MATRIX
+-----------------------------------------------------------------
+[[3988  685]
+ [ 605  722]]
+
+TN = 3988 | FP = 685
+FN = 605 | TP = 722
+
+-----------------------------------------------------------------
+CLASSIFICATION REPORT
+-----------------------------------------------------------------
+                 precision    recall  f1-score   support
+
+Non-Default (0)       0.87      0.85      0.86      4673
+    Default (1)       0.51      0.54      0.53      1327
+
+       accuracy                           0.79      6000
+      macro avg       0.69      0.70      0.69      6000
+   weighted avg       0.79      0.79      0.79      6000
+
+=================================================================
+END OF EXPERIMENT
+=================================================================
+```
 
 ---
 
@@ -100,14 +235,14 @@ The pipeline generates training and evaluation plots saved as PNG images:
 
 ```
 credit-card-default-prediction/
-├── credit_card_default.csv     # Dataset file
-├── dataset.py                  # Script to download dataset via kagglehub
+├── credit_card_default.csv     # Raw dataset file
+├── dataset.py                  # Kaggle dataset downloader script
 ├── main.py                     # Main execution pipeline
 ├── README.md                   # Project documentation
 ├── .gitignore                  # Git ignore rules
-├── loss_curve.png              # Loss curve plot
-├── accuracy_curve.png          # Accuracy curve plot
-├── confusion_matrix.png        # Confusion matrix plot
+├── loss_curve.png              # Training vs Validation loss plot
+├── accuracy_curve.png          # Training vs Validation accuracy plot
+├── confusion_matrix.png        # Confusion matrix heatmap plot
 ├── roc_curve.png               # ROC curve plot
 └── precision_recall_curve.png  # Precision-Recall curve plot
 ```
@@ -123,8 +258,8 @@ Ensure Python 3.10+ is installed along with dependencies:
 pip install pandas numpy matplotlib seaborn scikit-learn tensorflow kagglehub
 ```
 
-### 2. Run the Pipeline
-Execute `main.py`:
+### 2. Execute Script
+Run `main.py`:
 
 ```bash
 python main.py
